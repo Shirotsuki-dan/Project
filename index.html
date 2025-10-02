@@ -3,24 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Penghitung BIaya Layanan</title>
+  <title>Gabungan Project 4 & Optimal Payment</title>
+  <link rel ="stylesheet" href="style.css">
   <style>
     body { font-family: Arial, sans-serif; margin: 30px; }
     .container { max-width: 700px; margin: auto; }
-    .result { margin: 10px 0; padding: 8px; background: #f0f0f0; border-radius: 5px; }
+    .result { margin: 10px 0; padding: 8px; background: #295f19; border-radius: 5px; }
     label { display: block; margin-top: 15px; }
     input, button { margin: 5px 0; }
   </style>
 </head>
-<body>
+
   <h1>Optimasi Biaya Layanan Streaming & Pembayaran Optimal</h1>
   <div class="container">
     <!-- Optimal Payment Calculator (Netflix-like) -->
-    <h2>Apabila x = 50 >> Limit Kiri = Rp. 50.000 & Limit Kanan = Rp. 90.000</h2>
-    <h2>Apabila x = 200 >> Limit kiri = 90.000 & Limit Kanan = Rp. 150.000</h2>
     <h2>Hitung Pembayaran Optimal (Seperti Netflix)</h2>
     <label for="numUsers">Jumlah pengguna yang berbagi akun:</label>
-    <input type="number" id="numUsers" min="1" max="4" placeholder="Contoh: 3">
+    <input type="number" id="numUsers" min="1" max="4" placeholder="Jumlah Orang: 3">
     <button onclick="hitungOptimalPayment()">Hitung Optimal</button>
     <div class="result" id="optimalResult"></div>
 
@@ -171,6 +170,3 @@ function cekTurunan() {
   </script>
 </body>
 </html>
-
-
-
