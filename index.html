@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gabungan Project 4 & Optimal Payment</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    .container { max-width: 700px; margin: auto; }
+    .result { margin: 10px 0; padding: 8px; background: #f0f0f0; border-radius: 5px; }
+    label { display: block; margin-top: 15px; }
+    input, button { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>Optimasi Biaya Layanan Streaming & Pembayaran Optimal</h1>
+  <div class="container">
+    <!-- Optimal Payment Calculator (Netflix-like) -->
+    <h2>Hitung Pembayaran Optimal (Seperti Netflix)</h2>
+    <label for="numUsers">Jumlah pengguna yang berbagi akun:</label>
+    <input type="number" id="numUsers" min="1" max="4" placeholder="Contoh: 3">
+    <button onclick="hitungOptimalPayment()">Hitung Optimal</button>
+    <div class="result" id="optimalResult"></div>
+
+    <!-- Input Penyimpanan -->
+    <label for="storage">Masukkan kebutuhan penyimpanan (GB):</label>
+    <input type="number" id="storage" min="0" max="600" placeholder="Contoh: 180">
+    <button onclick="hitungBiaya()">Hitung Biaya</button>
+    <div class="result" id="result"></div>
+
+    <!-- Grafik Piecewise -->
+    <h2>Grafik Fungsi Piecewise C(x)</h2>
+    <canvas id="grafik" width="600" height="300"></canvas>
+
+    <!-- Limit & Kekontinuan -->
+    <h2>Analisis Limit & Kekontinuan</h2>
+    <button onclick="cekLimit()">Cek Limit di x=50 dan x=200</button>
+    <div class="result" id="limitResult"></div>
+
+    <!-- Optimasi -->
+    <h2>Optimasi Biaya</h2>
+    <p>Jika rata-rata kebutuhan 180 GB, sistem akan memilih paket paling murah secara otomatis:</p>
+    <button onclick="cekOptimum(180)">Cek Optimum (180 GB)</button>
+    <div class="result" id="optimumResult"></div>
+
+    <!-- Turunan -->
+    <h2>Turunan Fungsi C(x)</h2>
+    <button onclick="cekTurunan()">Hitung Turunan per Interval</button>
+    <div class="result" id="turunanResult"></div>
+  </div>
+
+  <script>
+// Optimal Payment Calculator
+function hitungOptimalPayment() {
+  const numUsers = parseInt(document.getElementById('numUsers').value);
+  if (isNaN(numUsers) || numUsers < 1) {
+    document.getElementById('optimalResult').innerHTML = 'Masukkan jumlah pengguna yang valid!';
+    return;
+  }
+  const plans = [
+    { name: 'Basic Bulanan', price: 65000, duration: 1, maxUsers: 1 },
+    { name: 'Standard Bulanan', price: 120000, duration: 1, maxUsers: 2 },
+    { name: 'Premium Bulanan', price: 170000, duration: 1, maxUsers: 4 },
+    { name: 'Premium Tahunan', price: 170000 * 12 * 0.9, duration: 12, maxUsers: 4 }
+  ];
+  let bestPlan = null;
+  let bestPerUser = Infinity;
+  plans.forEach(plan => {
+    if (numUsers <= plan.maxUsers) {
+      const perUser = plan.price / numUsers;
+      if (perUser < bestPerUser) {
+        bestPerUser = perUser;
+        bestPlan = plan;
+      }
+    }
+  });
+  let result = '';
+  if (bestPlan) {
+    result = `Paket optimal: <b>${bestPlan.name}</b><br>Biaya per orang: <b>Rp${bestPerUser.toLocaleString('id-ID')}</b> per bulan`;
+    if (bestPlan.duration > 1) {
+      result += `<br>(Harga sudah diskon tahunan, dibagi ${bestPlan.duration} bulan)`;
+    }
+  } else {
+    result = 'Tidak ada paket yang sesuai jumlah pengguna.';
+  }
+  document.getElementById('optimalResult').innerHTML = result;
+}
+
+// Fungsi Piecewise C(x)
+function C(x) {
+  if (x <= 50) return 50000;
+  else if (x <= 200) return 90000;
+  else if (x <= 500) return 150000;
+  else return 150000 + (x - 500) * 2000;
+}
+// Hitung biaya
+function hitungBiaya() {
+  let x = parseInt(document.getElementById("storage").value);
+  let biaya = C(x);
+  let paket = "";
+  if (x <= 50) paket = "Paket Basic";
+  else if (x <= 200) paket = "Paket Standard";
+  else if (x <= 500) paket = "Paket Premium";
+  else paket = "Paket Premium + Biaya Tambahan";
+  document.getElementById("result").innerHTML =
+    `Penyimpanan: ${x} GB <br> Biaya: Rp ${biaya.toLocaleString("id-ID")} <br> Paket: ${paket}`;
+}
+// Gambar grafik piecewise
+window.onload = function() {
+  let canvas = document.getElementById("grafik");
+  let ctx = canvas.getContext("2d");
+  let scaleX = 1;    
+  let scaleY = 0.001; 
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height - C(0) * scaleY);
+  for (let x = 0; x <= 600; x++) {
+    ctx.lineTo(x * scaleX, canvas.height - C(x) * scaleY);
+  }
+  ctx.strokeStyle = "blue";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  // sumbu
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height);
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.moveTo(0, 0);
+  ctx.lineTo(0, canvas.height);
+  ctx.strokeStyle = "black";
+  ctx.stroke();
+  ctx.fillText("GB (x)", canvas.width - 30, canvas.height - 5);
+  ctx.fillText("Biaya (Rp)", 10, 10);
+};
+// Cek limit & kekontinuan
+function cekLimit() {
+  let left50 = C(50 - 0.001);
+  let right50 = C(50 + 0.001);
+  let left200 = C(200 - 0.001);
+  let right200 = C(200 + 0.001);
+  let text = `
+    x = 50 → Limit kiri = Rp ${left50}, Limit kanan = Rp ${right50} <br>
+    x = 200 → Limit kiri = Rp ${left200}, Limit kanan = Rp ${right200} <br>
+    Fungsi tidak kontinu di titik 50 dan 200 (diskontinuitas loncat).
+  `;
+  document.getElementById("limitResult").innerHTML = text;
+}
+// Cek optimum untuk kebutuhan tertentu
+function cekOptimum(x) {
+  let biaya = C(x);
+  let paket = (x <= 50) ? "Paket Basic"
+             : (x <= 200) ? "Paket Standard"
+             : (x <= 500) ? "Paket Premium"
+             : "Paket Premium + Tambahan";
+  document.getElementById("optimumResult").innerHTML =
+    `Untuk ${x} GB, paket optimum = ${paket} dengan biaya Rp ${biaya.toLocaleString("id-ID")}`;
+}
+// Turunan per interval
+function cekTurunan() {
+  let text = `
+    Interval 0–50 GB → C(x) = 50.000 → Turunan = 0 <br>
+    Interval 50–200 GB → C(x) = 90.000 → Turunan = 0 <br>
+    Interval 200–500 GB → C(x) = 150.000 → Turunan = 0 <br>
+    Interval x > 500 GB → C(x) = 150.000 + 2000(x-500) → Turunan = 2000 <br>
+    Artinya: <br>
+    • Dalam paket, biaya konstan (turunan 0). <br>
+    • Setelah 500 GB, biaya naik linear Rp 2.000 per GB.
+  `;
+  document.getElementById("turunanResult").innerHTML = text;
+}
+  </script>
+</body>
+</html>
